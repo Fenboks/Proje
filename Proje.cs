@@ -1,3 +1,4 @@
+using System.Data.Common;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Threading;
@@ -66,12 +67,12 @@ public class Admin : Account
     public override void InitialiseMenu()
     {
         ConsoleHandler.PrimaryMessage("\nMerhaba, ");
-        ConsoleHandler.PrimaryMessage($"{Username}!\n", ConsoleColor.Green, true);
+        ConsoleHandler.PrimaryMessage($"{Username}!\n", ConsoleColor.Magenta, true);
 
         while (true)
         {
-            ConsoleHandler.PrimaryMessage("\n[ Yönetici Seçenekleri ]\n\n1. Hisse Düzenle\n2. Hisse Kaldır\n3. Mevcut Kullanıcı Listesi\n4. Kullanıcı Kaldır\n5. Çıkış Yap\n\nSeçeneğiniz: ");
-            
+            ConsoleHandler.PrimaryMessage("\n[ Yönetici Seçenekleri ]\n\n1. Hisse Ekle/Düzenle\n2. Hisse Kaldır\n3. Mevcut Kullanıcı Listesi\n4. Kullanıcı Kaldır\n5. Çıkış Yap\n\nSeçeneğiniz: ");
+
             string choice = Console.ReadLine() ?? "";
 
             ConsoleHandler.CustomClear();
@@ -97,16 +98,27 @@ public class Admin : Account
 
                         break;
                     }
+
                 case "2": // Hisse Kaldır
                     {
                         ConsoleHandler.StockListVisible(false);
 
                         Console.Write("Silinecek Hisse Sembolü: ");
                         string symbol = Console.ReadLine() ?? "";
+                        symbol = symbol.ToUpperInvariant();
 
-                        if (StockExchangeHandler.RemoveStock(symbol))
+                        if (StockExchangeHandler.Stocks.ContainsKey(symbol))
                         {
-                            ConsoleHandler.PrimaryMessage("\nHisse başarıyla silindi.\n", true);
+                            Console.Write("\nHisse silme işlemini onaylamak için \"evet\" yazın: ");
+                            string response = Console.ReadLine() ?? "";
+
+                            ConsoleHandler.CustomClear();
+
+                            if (response.ToLowerInvariant() == "evet")
+                            {
+                                StockExchangeHandler.RemoveStock(symbol);
+                                ConsoleHandler.PrimaryMessage("\nHisse başarıyla silindi.\n", true);
+                            }
                         }
                         else
                         {
@@ -115,7 +127,7 @@ public class Admin : Account
 
                         break;
                     }
-
+                     
                 case "3": // Mevcut Kullanıcı Listesi
                     AccountHandler.ListUsers(this);
 
@@ -140,6 +152,8 @@ public class Admin : Account
                     }
 
                 case "5": // Çıkış Yap
+                    ConsoleHandler.PrimaryMessage("\nÇıkış yapıldı.\n", true);
+
                     return;
 
                 default:
@@ -489,7 +503,7 @@ public static class AccountHandler
     {
         if (authorisedAccount.AccountType == EnumAccountType.Yonetici)
         {
-            ConsoleHandler.PrimaryMessage("Yönetici Listesi:\n");
+            ConsoleHandler.PrimaryMessage("\nYönetici Listesi:\n");
 
             foreach (var account in Accounts)
             {
@@ -547,14 +561,9 @@ public static class StockExchangeHandler
     {
         Stocks[symbol.ToUpperInvariant()] = price;
     }
-    public static bool RemoveStock(string symbol)
+    public static void RemoveStock(string symbol)
     {
-        if (Stocks.Remove(symbol.ToUpperInvariant()))
-        {
-            return true;
-        }
-
-        return false;
+        Stocks.Remove(symbol.ToUpperInvariant());
     }
     public static void ListStocks()
     {
@@ -564,19 +573,20 @@ public static class StockExchangeHandler
         if (Stocks.Count == 0)
         {
             Console.Write("Şu anda borsada hisse yok.\n");
-            return;
         }
-
-        foreach (var stock in Stocks)
+        else
         {
-            Console.Write("Hisse: ");
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.Write($"{stock.Key}");
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.Write(" | Fiyat: ");
-            Console.ForegroundColor = ConsoleColor.DarkGreen;
-            Console.Write($"{stock.Value:C}\n");
-            Console.ForegroundColor = ConsoleColor.White;
+            foreach (var stock in Stocks)
+            {
+                Console.Write("Hisse: ");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write($"{stock.Key}");
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write(" | Fiyat: ");
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                Console.Write($"{stock.Value:C}\n");
+                Console.ForegroundColor = ConsoleColor.White;
+            }
         }
 
         Console.ForegroundColor = ConsoleColor.White;
@@ -592,12 +602,12 @@ public static class StockExchangeHandler
         {
             Thread.Sleep(5000);
 
-            lock (StockExchangeHandler.Stocks)
+            lock (Stocks)
 
             {
-                foreach (var stockKey in StockExchangeHandler.Stocks.Keys.ToList())
+                foreach (var stockKey in Stocks.Keys.ToList())
                 {
-                    decimal newPrice = StockExchangeHandler.Stocks[stockKey] + ((decimal)(random.NextDouble() - 0.5) * 0.2m * StockExchangeHandler.Stocks[stockKey]);
+                    decimal newPrice = Stocks[stockKey] + ((decimal)(random.NextDouble() - 0.5) * 0.2m * Stocks[stockKey]);
 
                     EditStock(stockKey, newPrice);
                 }
@@ -631,7 +641,7 @@ public static class ConsoleHandler
         {
             StockListVisible(true);
         }
-        
+
         Console.ForegroundColor = color;
 
         try
@@ -712,7 +722,7 @@ public static class Program
         while (true)
         {
             ConsoleHandler.PrimaryMessage("\n[ Ana Menü ]\n\n1. Giriş Yap\n2. Kayıt Ol\n3. Çıkış Yap\n\nSeçeneğiniz: ");
-            
+
             string choice = Console.ReadLine() ?? "";
 
             ConsoleHandler.CustomClear();
