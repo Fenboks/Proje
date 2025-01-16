@@ -21,34 +21,34 @@ Bu borsa sistemi projesi, kullanıcı hesaplarının yönetimini ve hisse alım-
 
 ## Varsayılan Veriler
 - Varsayılan yönetici hesabı:
-  - Kullanıcı Adı: 'admin'
-  - Şifre: admin
+  - Kullanıcı Adı: `admin`
+  - Şifre: `admin`
 - Varsayılan hisseler:
-  - AAPL, GOOG, AMZN, TSLA (örnek fiyatlarla)
+  - `AAPL`, `GOOG`, `AMZN`, `TSLA` (örnek fiyatlarla)
 
 ## Teknik Detaylar
 
 ### Yönetim Sınıfları
-Hesap oluşturma, kaldırma ve giriş yapmak gibi işlemler AccountHandler sınıfı ile yönetilmiştir.
-StockExchangeHandler sınıfı ile ayrı bir borsa yönetimi mekanizması geliştirilmiştir.
+Hesap oluşturma, kaldırma ve giriş yapmak gibi işlemler `AccountHandler` sınıfı ile yönetilmiştir.
+`StockExchangeHandler` sınıfı ile ayrı bir borsa yönetimi mekanizması geliştirilmiştir.
 
 ### Soyutlama ve Kalıtım
-Hesap Account soyut sınıfı ile müşteri Customer ve yönetici Admin alt sınıfları türetilmiştir.
+Hesap `Account` soyut sınıfı ile müşteri `Customer` ve yönetici `Admin` alt sınıfları türetilmiştir.
 
 ### Enkapsülasyon
-Şifrelenmiş parola _passwordHash gizli özelliğinde saklanmış ve şifreleme HashPassword, şifre doğrulama VerifyPassword metodları özel alanlarla korunmuştur.
+Şifrelenmiş parola `_passwordHash` gizli özelliğinde saklanmış ve şifreleme `HashPassword`, şifre doğrulama `VerifyPassword` metodları özel alanlarla korunmuştur.
 Şifreleme için kullanılan algoritma oldukça basit ve pek koruma sağlamayan bir örnektir.
 
 ### Polimorfizm
-Kullanıcı seçenekleri için InitialiseMenu soyut metodu, farklı hesap türelerinde farklı şekilde uygulanmıştır.
-Ayrıca, bir çok yerde Customer veya Admin yerine üst sınıf olan Account kullanılması polimorfizme örnektir.
+Kullanıcı seçenekleri için `InitialiseMenu` soyut metodu, farklı hesap türelerinde farklı şekilde uygulanmıştır.
+Ayrıca, bir çok yerde `Customer` veya `Admin` yerine üst sınıf olan `Account` kullanılması polimorfizme örnektir.
 
 ### Kütüphane ve Koleksiyon
-Müşteri portföyü ve hisse fiyatları için Dictionary, mevcut hesaplar için List koleksiyonları oluşturulmuştur.
-System.Linq ve System.Collections etkin bir şekilde kullanılmıştır.
+Müşteri portföyü ve hisse fiyatları için `Dictionary`, mevcut hesaplar için `List` koleksiyonları oluşturulmuştur.
+`System.Linq` ve `System.Collections` etkin bir şekilde kullanılmıştır.
 
 ### Overload ve İsteğe Bağlı Parameter
-ConsoleHandler sınıfında 2 tane PrimaryMessage mesaj yazdırma metodu bulunmaktadır, aşırı yüklenmiş bir metod olarak 2 tanesi isteğe bağlı 3 tane parametre veya 2 tane zorunlu parametre kabul eder.
+`ConsoleHandler` sınıfında 2 tane `PrimaryMessage` mesaj yazdırma metodu bulunmaktadır, aşırı yüklenmiş bir metod olarak 2 tanesi isteğe bağlı 3 tane parametre veya 2 tane zorunlu parametre kabul eder.
 
 ### Kullanıcı Deneyimi
 Konsol arayüzü, renk kodları ve düzenli mesajlarla kullanıcı dostu hale getirilmiştir. Konsol çıktıları net ve anlaşılırdır.
